@@ -11,7 +11,6 @@ $data = array();
 $error = array();
 
 
-
 if($_REQUEST['action']=='insert'){		 
 				$price = $_POST['price'];
 				$user_id = $_SESSION['user_id']; 

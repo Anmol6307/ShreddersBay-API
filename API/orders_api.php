@@ -13,12 +13,13 @@ $error = array();
 
 
 if($_REQUEST['action']=='insert'){	
-				$user_id = $_SESSION['user_id']; 
+				$user_id = $_GET['user_id']; 
 				$prod_id = $_POST['prod_id'];
 				$total_weight = $_POST['approx_weight'];
 				$total_price = $_POST['approx_price']; 
+				$file_name = $_POST['filename'];
                 $schedule_date = $_POST['schedule_date'];
-				$query = "INSERT INTO tbl_orders(user_id, prod_id, total_weight, approx_price , booking_date, schedule_date) VALUES ('$user_id', '$prod_id', '$total_weight', '$total_price',now(), '$schedule_date')";
+				$query = "INSERT INTO tbl_orders(user_id, prod_id, total_weight, approx_price, filename,  booking_date, schedule_date) VALUES ('$user_id', '$prod_id', '$total_weight', '$total_price', '$file_name', now(), '$schedule_date')";
 				if(mysqli_query($con, $query))
 				{
 				  $data["message"] = "Order Placed";         
@@ -31,7 +32,41 @@ if($_REQUEST['action']=='insert'){
 
 if($_REQUEST['action']=='select')
 {
-	 $query = "SELECT * FROM tbl_orders as o left join tbl_products as p on p.p_id=o.prod_id where o.user_id = '".$_SESSION['user_id']."'";
+	 $query = "SELECT * FROM tbl_orders as o left join tbl_users as user on user.id=o.user_id left join tbl_address as addr on addr.addr_id=o.addr_id left join tbl_products as p on p.p_id=o.prod_id WHERE o.status = 1 order by o.booking_id  DESC";
+	 $res = mysqli_query($con, $query);
+	 while($row = mysqli_fetch_assoc($res)){
+	 	$data[] = $row;
+	  // $data['name'] = $row['name'];
+	  // $data['email'] = $row['email'];
+	  // $data['mobile'] = $row['mobile'];
+	  // $data['date'] = $row['date'];
+ 	}
+	
+		   echo json_encode($data);
+
+
+}
+
+if($_REQUEST['action']=='select_current')
+{
+	 $query = "SELECT * FROM tbl_orders as o left join tbl_users as user on user.id=o.user_id left join tbl_address as addr on addr.addr_id=o.addr_id left join tbl_products as p on p.p_id=o.prod_id WHERE o.dealer_id ='".$_GET['user_id']."' and o.status = 2 order by o.booking_id  DESC";
+	 $res = mysqli_query($con, $query);
+	 while($row = mysqli_fetch_assoc($res)){
+	 	$data[] = $row;
+	  // $data['name'] = $row['name'];
+	  // $data['email'] = $row['email'];
+	  // $data['mobile'] = $row['mobile'];
+	  // $data['date'] = $row['date'];
+ 	}
+	
+		   echo json_encode($data);
+
+
+}
+
+if($_REQUEST['action']=='select_cancel')
+{
+	 $query = "SELECT * FROM tbl_orders as o left join tbl_users as user on user.id=o.user_id left join tbl_address as addr on addr.addr_id=o.addr_id left join tbl_products as p on p.p_id=o.prod_id WHERE o.status = 1 && o.dealer_id ='".$_GET['user_id']."' order by o.booking_id  DESC";
 	 $res = mysqli_query($con, $query);
 	 while($row = mysqli_fetch_assoc($res)){
 	 	$data[] = $row;
@@ -50,31 +85,30 @@ if($_REQUEST['action']=='select')
 
 if($_REQUEST['action']=='select_id')
 {
-	 $query = "SELECT * FROM tbl_cart WHERE id='".$form_data->id."'";
+	 $query = "SELECT * FROM tbl_orders as o left join tbl_products as p on p.p_id=o.prod_id where o.user_id = '".$_GET['user_id']."'";
 	// echo "$query";
 	 $res = mysqli_query($con, $query);
-	 $row = mysqli_fetch_array($res);
-	 $data[] = $row;
-	  //$data['name'] = $row['name'];
-	  //$data['email'] = $row['email'];
-	  //$data['mobile'] = $row['mobile'];
-	  //$data['date'] = $row['date'];
- 
- echo json_encode($data);
-}
+	  while($row = mysqli_fetch_assoc($res)){
+	 	$data[] = $row;
+	  // $data['name'] = $row['name'];
+	  // $data['email'] = $row['email'];
+	  // $data['mobile'] = $row['mobile'];
+	  // $data['date'] = $row['date'];
+ 	}
+	
+		   echo json_encode($data);
 
+
+}
 
 if($_REQUEST['action']=='edit')
 {
-                $price = $_POST['price'];
-				$user_id = $_SESSION['user_id']; 
+ 	            $user_id = $_GET['user_id']; 
 				$prod_id = $_POST['prod_id'];
-				$total_weight = $_POST['weight'];
-				$total_price = $total_weight*$price; 
-				$location = "../upload/";
-                $file_name = $_FILES['file']['name'];
-                $tmp_name = $_FILES['file']['tmp_name'];
-				move_uploaded_file($tmp_name, $location . $file_name);
+				$total_weight = $_POST['approx_weight'];
+				$total_price = $_POST['approx_price']; 
+				$file_name = $_POST['filename'];
+                $schedule_date = $_POST['schedule_date'];
 				
 	$query = "UPDATE tbl_cart SET user_id = '$user_id', prod_id = '$prod_id', total_price = '$total_price', total_weight = '$total_weight', filename = '$file_name', updated_at = now() WHERE id='".$form_data->id."'";
 	// echo $query;
@@ -83,7 +117,34 @@ if($_REQUEST['action']=='edit')
 		$data["message"] = "Data Updated";         
 	}
 echo json_encode($data);
-}		
+}	
+
+
+if($_REQUEST['action']=='accept')
+{
+ 	            $dealer_id = $_GET['user_id']; 
+ 	            $booking_id=$_POST['booking_id'];
+			
+	$query = "UPDATE tbl_orders SET dealer_id = '$dealer_id', status = '2', updated_at = now() WHERE booking_id='".$booking_id."'";
+	if(mysqli_query($con, $query))
+	{
+		$data["message"] = "Data Updated";         
+	}
+echo json_encode($data);
+}	
+
+
+if($_REQUEST['action']=='cancel')
+{
+ 	            $booking_id=$_POST['booking_id'];
+			
+	$query = "UPDATE tbl_orders SET status = '1', updated_at = now() WHERE booking_id='".$booking_id."'";
+	if(mysqli_query($con, $query))
+	{
+		$data["message"] = "Data Updated";         
+	}
+echo json_encode($data);
+}
 
 
 if($_REQUEST['action']=='delete')
