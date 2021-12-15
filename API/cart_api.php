@@ -89,7 +89,7 @@ echo json_encode($data);
 
 if($_REQUEST['action']=='delete')
 {
-	$query = "DELETE from tbl_cart  WHERE id='".$form_data->id."'";
+	$query = "DELETE from tbl_cart WHERE user_id='".$_GET['user_id']."'";
 	if(mysqli_query($con, $query))
 	{
 		$data["message"] = "Deleted Successfully";         

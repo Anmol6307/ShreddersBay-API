@@ -69,21 +69,7 @@ if($_REQUEST['action']=='select_id')
     echo json_encode($data); 
 }
 
-
-// if($_REQUEST['action']=='edit')
-// {
-
-// 	$user_id = $_SESSION['user_id'];
-// 	$country_id = $_POST['country'];
-// 	$state_id = $_POST['state'];
-// 	$city_id = $_POST['city'];
-// 	//$area_id = mysqli_real_escape_string($con, $form_data->area_id);
-// 	$address = $_POST['address'];
-// 	$pin_code = $_POST['pincode'];
-// 	//$add_type = mysqli_real_escape_string($con, $form_data->add_type);
-// 	$landmark = $_POST['landmark'];
-	
-// }		
+		
 
 
 if($_REQUEST['action']=='delete')

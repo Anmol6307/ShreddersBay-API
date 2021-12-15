@@ -1,6 +1,9 @@
 <?php
-
-//http://localhost:8000/SHREDDERSBAY_API/API/user_api.php?action=select
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
+header('Access-Control-Allow-Headers: Content-Type');
+ //http://localhost:8000/SHREDDERSBAY_API/API/user_api.php?action=select
+session_start();
 include("../DB.php");
 $form_data = json_decode(file_get_contents("php://input"));
 $data = array();
@@ -9,9 +12,11 @@ $error = array();
 
 
 if ($_REQUEST['action'] == 'insert') {
-    $user_id = mysqli_real_escape_string($con, $form_data->user_id);
-    $mobile = mysqli_real_escape_string($con, $form_data->mobile);
-    $query = "INSERT INTO tbl_contacts (user_id, mobile, status) VALUES ('$user_id', '$mobile', '0')";
+    $user_id = $_POST['user_id'];
+    $name = $_POST['name'];
+    $email = $_POST['email'];
+    $mobile = $_POST['mobile'];
+    $query = "INSERT INTO tbl_contacts (user_id, name, email, mobile, status) VALUES ('$user_id', '$name', '$email', '$mobile', '0')";
     if (mysqli_query($con, $query)) {
         $data["message"] = "Data Inserted";
     }

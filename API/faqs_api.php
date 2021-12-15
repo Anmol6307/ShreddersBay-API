@@ -25,15 +25,16 @@ if($_REQUEST['action']=='select')
 	 $query = "SELECT * FROM tbl_faqs";
 	 $res = mysqli_query($con, $query);
 	 while($row = mysqli_fetch_assoc($res)){
-	 	$data = $row;
+	 	$data[] = $row;
 	  // $data['name'] = $row['name'];
 	  // $data['email'] = $row['email'];
 	  // $data['mobile'] = $row['mobile'];
 	  // $data['date'] = $row['date'];
-	   echo json_encode($data);
  	}
+ 		   echo json_encode($data);
 
 }
+
 
 
 
